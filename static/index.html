@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Processor & QA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #287363;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #18c49f;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+
+
+
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>URL Processor & QA</h1>
+        <div id="url-section">
+            <div class="form-group">
+                <label for="url-input">Enter URL:</label>
+                <input type="text" id="url-input" placeholder="Enter URL here">
+            </div>
+            <button id="url-button" onclick="processURL()">Process URL</button>
+        </div>
+
+        <div id="question-section" style="display: none;">
+            <div class="form-group">
+                <label for="question-input">Ask a Question:</label>
+                <input type="text" id="question-input" placeholder="Enter your question here">
+            </div>
+            <button id="question-button" onclick="askQuestion()">Ask Question</button>
+            <button onclick="resetToURLInput()">Reset to Enter New URL</button>
+        </div>
+
+        <div id="response-section" class="response" style="display: none;"></div>
+    </div>
+
+    <script>
+        let sessionId = null;
+
+        async function processURL() {
+            const urlButton = document.getElementById("url-button");
+            const url = document.getElementById("url-input").value;
+
+            if (!url) {
+                alert("Please enter a valid URL.");
+                return;
+            }
+
+            urlButton.textContent = "Processing...";
+            urlButton.disabled = true;
+
+            try {
+                const response = await fetch("http://127.0.0.8:8000/set_url/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    sessionId = data.session_id;
+                    document.getElementById("url-section").style.display = "none";
+                    document.getElementById("question-section").style.display = "block";
+                    alert(data.message);
+                } else {
+                    alert(data.detail);
+                }
+            } catch (error) {
+                console.error("Error processing URL:", error);
+                alert("An error occurred. Please try again.");
+            } finally {
+                urlButton.textContent = "Process URL";
+                urlButton.disabled = false;
+            }
+        }
+
+        async function askQuestion() {
+            const questionButton = document.getElementById("question-button");
+            const question = document.getElementById("question-input").value;
+
+            if (!question) {
+                alert("Please enter a question.");
+                return;
+            }
+
+            if (!sessionId) {
+                alert("Session ID is missing. Please process a URL first.");
+                return;
+            }
+
+            questionButton.textContent = "Processing...";
+            questionButton.disabled = true;
+
+            try {
+                const response = await fetch("http://127.0.0.8:8000/ask_question/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ session_id: sessionId, question: question })
+                });
+
+                const data = await response.json();
+                const responseSection = document.getElementById("response-section");
+
+                if (response.ok) {
+                    responseSection.textContent = `Answer: ${data.answer}`;
+                    responseSection.style.display = "block";
+                } else {
+                    responseSection.textContent = `Error: ${data.detail}`;
+                    responseSection.style.display = "block";
+                }
+            } catch (error) {
+                console.error("Error asking question:", error);
+                alert("An error occurred. Please try again.");
+            } finally {
+                questionButton.textContent = "Ask Question";
+                questionButton.disabled = false;
+            }
+        }
+
+        function resetToURLInput() {
+            sessionId = null;
+            document.getElementById("url-section").style.display = "block";
+            document.getElementById("question-section").style.display = "none";
+            document.getElementById("response-section").style.display = "none";
+            document.getElementById("url-input").value = "";
+            document.getElementById("question-input").value = "";
+        }
+    </script>
+</body>
+</html>
