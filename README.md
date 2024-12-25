@@ -52,7 +52,7 @@ pip install -r requirements.txt
 
 ## Configuration
 
-1. Set up your Ollama server URL in `utils.py`:
+1. Set up your Ollama server URL or add you LLM in in `utils.py`:
 ```python
 base_url = 'https://your-ollama-server.com'  # Replace with your Ollama server URL
 ```
