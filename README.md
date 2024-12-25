@@ -23,8 +23,8 @@ An intelligent documentation retrieval system that uses LLMs (Large Language Mod
 
 1. Clone the repository:
 ```bash
-git clone [your-repository-url]
-cd [repository-name]
+git clone git@github.com:rubeyyyy/ChatwithURL.git
+cd ChatwithURL
 ```
 
 2. Create and activate a virtual environment:
@@ -119,9 +119,8 @@ The system handles various error cases:
 ## Technical Details
 
 ### Content Processing
-- Uses BeautifulSoup4 for HTML parsing
-- Intelligent content extraction
-- Removes boilerplate content
+- Fetches URL and extract the content
+- Split the text using RecursiveCharacterTextSplitter 
 - Preserves document structure
 
 ### Vector Search
@@ -131,14 +130,14 @@ The system handles various error cases:
 - Persistent storage
 
 ### LLM Integration
-- Uses Ollama for natural language processing
+- Uses Chatbedrock for natural language processing
 - Context-aware responses
 - Source attribution
 - Confidence scoring
 
 ## Acknowledgments
 
-- Ollama for LLM capabilities
+- Anthropic model for LLM capabilities
 - LangChain for the chain infrastructure
 - ChromaDB for vector storage
 - HuggingFace for embeddings
