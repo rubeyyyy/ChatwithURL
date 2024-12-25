@@ -6,46 +6,63 @@
     <title>URL Processor & QA</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f9;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
         .container {
             background: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            max-width: 90%;
         }
         h1 {
             text-align: center;
             color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         label {
-            font-weight: bold;
+            font-weight: 600;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            color: #444;
         }
-        input[type="text"], button {
+        input[type="text"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #287363;
+            outline: none;
         }
         button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
             background-color: #287363;
             color: white;
             cursor: pointer;
-            border: none;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #18c49f;
@@ -55,17 +72,29 @@
             cursor: not-allowed;
         }
         .response {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            margin-top: 25px;
+            padding: 20px;
+            border: 2px solid #eee;
+            border-radius: 10px;
             background-color: #f9f9f9;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
         }
-
-
-
-
-</style>
+        #question-section {
+            margin-top: 25px;
+        }
+        button#url-button {
+            background-color: #287363;
+        }
+        button#question-button {
+            background-color: #2c8578;
+        }
+        button[onclick="resetToURLInput"] {
+            background-color: #666;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -73,7 +102,7 @@
         <div id="url-section">
             <div class="form-group">
                 <label for="url-input">Enter URL:</label>
-                <input type="text" id="url-input" placeholder="Enter URL here">
+                <input type="text" id="url-input" placeholder="https://example.com">
             </div>
             <button id="url-button" onclick="processURL()">Process URL</button>
         </div>
@@ -81,10 +110,10 @@
         <div id="question-section" style="display: none;">
             <div class="form-group">
                 <label for="question-input">Ask a Question:</label>
-                <input type="text" id="question-input" placeholder="Enter your question here">
+                <input type="text" id="question-input" placeholder="What would you like to know about this content?">
             </div>
             <button id="question-button" onclick="askQuestion()">Ask Question</button>
-            <button onclick="resetToURLInput()">Reset to Enter New URL</button>
+            <button onclick="resetToURLInput()">Process New URL</button>
         </div>
 
         <div id="response-section" class="response" style="display: none;"></div>
@@ -162,10 +191,12 @@
                 const responseSection = document.getElementById("response-section");
 
                 if (response.ok) {
-                    responseSection.textContent = `Answer: ${data.answer}`;
+                    // Remove "Answer: " prefix from the response
+                    const answer = data.answer.replace(/^Answer:\s*/i, '');
+                    responseSection.textContent = answer;
                     responseSection.style.display = "block";
                 } else {
-                    responseSection.textContent = `Error: ${data.detail}`;
+                    responseSection.textContent = data.detail;
                     responseSection.style.display = "block";
                 }
             } catch (error) {
