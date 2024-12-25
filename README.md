@@ -35,7 +35,7 @@ source venv/bin/activate  # On Windows use: venv\Scripts\activate
 
 3. Install the required packages:
 ```bash
-pip install fastapi uvicorn langchain requests chromadb sentence-transformers
+pip install -r requirements.txt
 ```
 
 ## Project Structure
