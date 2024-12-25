@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException,  BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from utils import fetch_and_process_url, initialize_qa_chain
+from utils import fetch_and_process_url, initialize_qa_chain, cleanup_old_sessions
 import uuid
 import uvicorn
 
@@ -30,11 +30,13 @@ class QuestionInput(BaseModel):
 
 # Endpoint to set the URL
 @app.post("/set_url/")
-async def set_url(data: URLInput):
+async def set_url(data: URLInput, background_tasks: BackgroundTasks ):
     # Generate a unique session_id
     session_id = str(uuid.uuid4())
 
     try:
+        # Run cleanup before processing new URL
+        background_tasks.add_task(cleanup_old_sessions)
         retriever = fetch_and_process_url(data.url, session_id)
         user_state[session_id] = {"retriever": retriever}
         return {"message": "URL processed successfully. You can now ask questions.", "session_id": session_id}

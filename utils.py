@@ -107,3 +107,17 @@ def initialize_qa_chain(retriever):
     return RetrievalQA.from_chain_type(
         llm=llm, retriever=retriever, return_source_documents=False, chain_type_kwargs={"prompt": prompt}
     )
+
+import time
+# Add the cleanup function
+def cleanup_old_sessions(max_age_hours=1):
+    """Remove vectorstores older than specified hours"""
+    try:
+        for session_dir in os.listdir(VECTORSTORE_DIR):
+            session_path = os.path.join(VECTORSTORE_DIR, session_dir)
+            # Check directory age
+            if time.time() - os.path.getmtime(session_path) > max_age_hours * 3600:
+                shutil.rmtree(session_path)
+                logging.info(f"Cleaned up old session: {session_dir}")
+    except Exception as e:
+        logging.error(f"Error during cleanup: {e}")
